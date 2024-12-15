@@ -1,5 +1,5 @@
 /*
-    Author: Joe Waclawski
+    Author: Adam Rogers,
     Description: Simple udp server adapted from material found on the internet
     This is the "Server" side of a UDP communication example. It will respond
     to a message from the "Client"
@@ -17,7 +17,10 @@
 double savings = 12479.52;
 double checking = 1291.22;
 
-char[] checkBalance;
+char* checkBalance(int cORs);
+char* deposit(int cORs, double amount);
+char* withdrawl(int cORs, double amount);
+char* transfer(int cORs, double amount);
 // simple routine to print an error and exit
 void PrintErrorAndExit(char *lanErrorString)
 {
@@ -88,27 +91,31 @@ int main(void)
         printf("Received packet from %s:%d\n", inet_ntoa(lsSAOther.sin_addr), ntohs(lsSAOther.sin_port));
         
         // cast receieved data to expected type and print data
-
+        //LOGIC, OUR LOGIC
         lpTestData = (TestRequest *)(lanRecBuf);
-        switch(lpTestData->choice){
-          case 1:
-            char response[256] = checkBalance(lpTestData->cORs);
-            break;
-          case 2:
-            char response[256] = deposit(lpTestData->cors, lpTestData->amount);
-            break;
-
-        printf("Y = %f\n", lpTestData->lfY);
-        printf("Text = %s\n", lpTestData->lanText);
-
-
-
-	char response [1024];
-
-
-	sprintf(response,"The sum of X + Y is %f\n",lpTestData->lnX + lpTestData->lfY);
-	strcpy(lpTestData->lanText,response);
-	
+        switch(lpTestData->choice) {
+            case 1:
+                char response[256] = checkBalance(lpTestData->cORs);
+                break;
+            case 2:
+                char response[256] = deposit(lpTestData->cors, lpTestData->amount);
+                break;
+            case 3:
+                char response[256] = withdrawl(lpTestData->cors, lpTestData->amount);
+                break;
+            case 4:
+                char response[256] = transfer(lpTestData->cors, lpTestData->amount);
+            case 0:
+                char response[256] = "Thank you for using CSE384 Bank, goodbye!";
+                if (sendto(lnSocketId, lanRecBuf, lnReceiveLen, 0, (struct sockaddr*) &lsSAOther, lnSockStructLen) == -1)
+                {
+                    PrintErrorAndExit("sendto()");
+                }
+                memset(lanRecBuf,0,sizeof(lanRecBuf));
+                close(lnSocketId);
+                return 0;
+        }
+        strcpy(lpTestData->response, response);
         //now reply the client with the same data
         if (sendto(lnSocketId, lanRecBuf, lnReceiveLen, 0, (struct sockaddr*) &lsSAOther, lnSockStructLen) == -1)
         {
@@ -124,26 +131,80 @@ int main(void)
     return 0;
 }
 
-char[] checkBalance(int cORs){
-        char response[256];
-     switch(cORs){
-         case 1:
+char* checkBalance(int cORs) {
+    char response[256];
+    switch(cORs){
+        case 1:
             sprintf(response, "Your checking account total is %f\n",checking);
-            return reponse;
-         case 2:
+        return response;
+        case 2:
             sprintf(response, "Your checking account total is %f\n",savings);
-            return response;
-  }
+        return response;
+    }
+}
 
-  char[] deposit(int cORs, int amount){
+    char* deposit(int cORs, double amount) {
         char response[256];
-        switch(cORs){
-          case 1:
-            checking+=amount;
+        switch(cORs) {
+            case 1:
+                checking+=amount;
             sprintf(response, "Your checking account total is now: %f\n",checking);
             return response;
-          case 2:
-            savings+=amount;
+            case 2:
+                savings+=amount;
             sprintf(response, "Your savings account total is now: %f\n",savings);
             return response;
         }
+    }
+    char* withdrawl(int cORs, double amount){
+        char response[256];
+        switch(cORs) {
+            case 1:
+                if(amount>checking) {
+                    sprintf(response, "Insufficient Balance");
+                    return response;
+                }else {
+                    checking-=amount;
+                    sprintf(response,"Your new checking account balance is: %f\n",checking);
+                    return response;
+                }
+            break;
+            case 2:
+                if(amount>savings) {
+                    sprintf(response, "Insufficient Balance");
+                    return response;
+                }else {
+                    savings-=amount;
+                    sprintf(response,"Your new savings account balance is: %f\n",savings);
+                    return response;
+                }
+            break;
+        }
+    }
+    char* transfer(int cORs, double amount) {
+        char response[256];
+        switch(cORs) {
+            case 1:
+                if(amount>checking) {
+                    sprintf(response, "Insufficient Balance");
+                    return response;
+                }else {
+                    checking-=amount;
+                    savings+=amount;
+                    sprintf(response,"Your new checking account balance is: %f\nYour new savings account balance is: %f\n",checking, savings);
+                    return response;
+                }
+            break;
+            case 2:
+                if(amount > savings) {
+                    sprintf(response, "Insufficient Balance");
+                    return response;
+                } else {
+                    savings-=amount;
+                    checking-=amount;
+                    sprintf(response,"Your new checking account balance is: %f\nYour new savings account balance is: %f\n",checking, savings);
+                    return response;
+                }
+            break;
+        }
+    }
