@@ -132,3 +132,118 @@ int main(void)
     return 0;
 }
 
+
+
+
+void check_bal(BankAccount *account, BankFunction *choice){
+    printf("Which account?\n");
+    printf("1) Checking\n");
+    printf("2) Savings\n");
+    printf("Enter your choice: ");
+    scanf("%d", choice->&val);
+
+    switch (choice->val)
+        case 1:
+            sprintf(choice->response, "Checking Banlace: %.2f\n", account->checking_bal);
+            break;
+        case 2:
+            sprintf(choice->response, "Saving Balance is: %.2f\n", account->savings_bal);
+            break;
+        default:
+            printf("Invalid Selection. \n");
+            break;
+}
+
+
+void Deposit_mon(BankAccount *account, BankFunction *choice){
+    double amount;
+    printf("1) Checking\n");
+    printf("2) Savings\n");
+    printf("Enter your choice: ");
+    scanf("%d", choice->val);
+
+
+    printf("Enter amount: \n");
+    scanf("%.2f", &amount);
+
+    switch (choice->val)
+        case 1:
+            account->checking_bal+=amount;
+            sprintf(choice->response, "Deposit successfully\nNew Balance(Checking Account): %.2f\n", account->checking_bal);
+            break;
+        case 2:
+            account->savings_bal+=amount;
+            sprintf("Deposit successfully\nNew Balance(Saving Account): %.2f\n", account->savings_bal);
+            break;
+        default:
+            printf("Invalid Selection. \n");
+            break;
+}
+
+
+void withdraw_mon(BankAccount *account, BankFunction choice){
+    double amount;
+
+    printf("1) Checking\n");
+    printf("2) Savings\n");
+    printf("Enter your choice: ");
+    scanf("%d", choice->val);
+
+    printf("Enter amount: \n");
+    scanf("%.2f", &amount);
+
+
+    switch (choice->val)
+        case 1:
+            account->checking_bal-=amount;
+            sprintf(choice->response, "Deposit successfully\nNew Balance(Checking Account): %.2f\n", account->checking_bal);
+            break;
+        case 2:
+            account->savings_bal-=amount;
+            sprintf("Deposit successfully\nNew Balance(Saving Account): %.2f\n", account->savings_bal);
+            break;
+        default:
+            printf("Invalid Selection. \n");
+            break;
+}
+
+
+void transfer_mon(BankAccount *account, BankFunction *choice){
+    double amount;
+
+    printf("From which account are you transffering from? \n");
+    printf("1) Checking\n");
+    printf("2) Savings\n");
+    printf("Enter your choice: ");
+    scanf("%d", choice->val);
+
+    printf("Enter amount: \n");
+    scanf("%.2f", &amount);
+
+    switch (choice->val)
+    {
+        case 1:
+            if(amount > account->checking_bal){
+                printf("Insufficient Balance.\n");
+            }
+            else{
+                account->checking_bal-=amount;
+                account->savings_bal+=amount;
+                printf("Transferred Successfully.\n");
+                sprintf(choice->response,"Checking Account Balance after transaction: %.2f\n", account->checking_bal);
+                sprintf(choice->response, "Saving Account Balance after transaction: %.2f\n", account->savings_bal);
+            }
+            break;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
