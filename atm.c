@@ -18,7 +18,7 @@
 #include "bank.h"
 #include "pthread.h"
 
-#define BUFLEN 512    //Max length of buffer
+#define BUFLEN 512 //Max length of buffer
 
 // function to truncate stdin (i.e. keyboard input)
 // unused at this time. I just left it here in case I need it in the future
@@ -97,21 +97,32 @@ int main()
                 printf("Enter your choice: ");
                 scanf("%d", &lsTestData.cORs);
                 printf("Please enter deposit: ");
-                scanf("%f", &lsTestData.amount);
+                scanf("%lf", &lsTestData.amount);
                 break;
             case 3:
                 printf("Which account?\n1)Checking\n2)Savings\n");
                 printf("Enter your choice: ");
                 scanf("%d", &lsTestData.cORs);
                 printf("Please enter withdrawl amount: ");
-                scanf("%f", &lsTestData.amount);
+                scanf("%lf", &lsTestData.amount);
                 break;
             case 4:
-                printf("Which account would you like to transfer from?\n1)Checking\n2)Savings\n");
-                printf("Enter your choice: ");
-                scanf("%d", &lsTestData.cORs);
+                while(1){
+                    printf("Which account would you like to transfer from?\n1)Checking\n2)Savings\n");
+                    printf("Enter your choice: ");
+                    scanf("%d", &lsTestData.cORs);
+                    int sendto;
+                    printf("Which account would you like to transfer to?\n1)Checking\n2)Savings\n");
+                    printf("Enter your choice: ");
+                    scanf("%d", &sendto);
+                    if((lsTestData.cORs == 1 && sendto != 2) || (lsTestData.cORs == 2 && sendto != 1)){
+                        printf("Invalid Transfer\n");
+                    } else {
+                        break;
+                    }
+                }
                 printf("Please enter transfer amount: ");
-                scanf("%f", &lsTestData.amount);
+                scanf("%lf", &lsTestData.amount);
                 break;
             case 0:
                 printf("Thank you for choosing CSE384 bank. Goodbye!");

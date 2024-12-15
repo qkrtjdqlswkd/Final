@@ -15,6 +15,8 @@
 
 #define BUFLEN 512    //Max length of buffer
 
+double checking = 1283.34;
+double savings = 10000.00;
 
 char* checkBalance(int cORs);
 char* deposit(int cORs, double amount);
@@ -95,20 +97,17 @@ int main(void)
         lpTestData = (TestRequest *)(lanRecBuf);
         switch(lpTestData->choice) {
             case 1:
-                //debug_c(lpTestData->choice, lpTestData->cORs);
                 sprintf(response, "%s", checkBalance(lpTestData->cORs));
                 break;
             case 2:
-                //debug(lpTestData->choice, lpTestData->cORs, lpTestData->amount);
                 sprintf(response, "%s", deposit(lpTestData->cORs, lpTestData->amount));
                 break;
             case 3:
-                //debug(lpTestData->choice, lpTestData->cORs, lpTestData->amount);
                 sprintf(response, "%s", withdrawl(lpTestData->cORs, lpTestData->amount));
                 break;
             case 4:
-                //debug(lpTestData->choice, lpTestData->cORs, lpTestData->amount);
                 sprintf(response, "%s", transfer(lpTestData->cORs, lpTestData->amount));
+                break;
             case 0:
                 sprintf(response, "Thank you for using CSE384 Bank, goodbye!");
                 if (sendto(lnSocketId, lanRecBuf, lnReceiveLen, 0, (struct sockaddr*) &lsSAOther, lnSockStructLen) == -1)
@@ -152,6 +151,7 @@ char* checkBalance(int cORs) {
         static char response[256];
         switch(cORs) {
             case 1:
+                printf("Before deposit: %.2f, Deposit amount: %.2f\n", checking, amount);
                 checking+=amount;
             sprintf(response, "Your checking account total is now: %.2f\n",checking);
             break;
@@ -192,25 +192,25 @@ char* checkBalance(int cORs) {
             case 1:
                 if(amount>checking) {
                     sprintf(response, "Insufficient Balance");
-                    break;
                 }else {
+                    printf("checking before: %.2lf\namount: %.2lf\n", checking, amount);
                     checking -= amount;
+                    printf("checking after: %.2lf\n", checking);
+                    printf("savings before: %.2lf\namount: %.2lf\n", savings, amount);
                     savings += amount;
-                    sprintf(response,
-                            "Your new checking account balance is: %f\nYour new savings account balance is: %f\n",
-                            checking, savings);
-                    break;
+                    printf("savings after: %.2lf\n", savings);
+                    sprintf(response,"Checking Balance: %lf\nSavings Balance: %lf\n",checking, savings);
                 }
+                break;
             case 2:
-                if(amount > savings) {
+                if(amount>savings) {
                     sprintf(response, "Insufficient Balance");
-                    break;
                 } else {
                     savings-=amount;
-                    checking-=amount;
-                    sprintf(response,"Your new checking account balance is: %f\nYour new savings account balance is: %f\n",checking, savings);
-                    break;
+                    checking+=amount;
+                    sprintf(response,"Checking Balance: %lf\nSavings Balance: %lf\n", checking, savings);
                 }
+                break;
         }
         return response;
     }

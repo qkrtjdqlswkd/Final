@@ -23,10 +23,3 @@ typedef struct tr
     char response[256];
 }TestRequest;
 
-typedef struct ba
-{
-    double checking;
-    double savings;
-
-} BankAccount;
-
