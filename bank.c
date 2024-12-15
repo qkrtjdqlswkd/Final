@@ -1,5 +1,5 @@
 /*
-    Author: Adam Rogers, Park
+    Author: Adam Rogers, Sungbin Park
     Description: Simple udp server adapted from material found on the internet
     This is the "Server" side of a UDP communication example. It will respond
     to a message from the "Client"

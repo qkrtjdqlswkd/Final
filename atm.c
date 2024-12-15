@@ -1,5 +1,5 @@
 /*
-    Author: Joe Waclawski
+    Author: Adam Rogers, Sungbin Park
     Description: Simple udp client adapted from material found on the internet
     This is the "Client" side of a UDP communication example. It will prompt
     the user for a message, and send it to the server. It will then  display
