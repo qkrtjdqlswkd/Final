@@ -15,17 +15,18 @@ typedef struct td
     char lanText[256];
     double sum;
 }TestData;
-
-
-typedef struct {
-    double savings_bal;
-    double checking_bal;
-} BankAccount;
-
-
-typedef struct bank_func{
+typedef struct tr
+{
     int choice;
-    int val;
+    int cORs;
+    double amount;
     char response[256];
-} BankFunction;
+}TestRequest;
+
+typedef struct ba
+{
+    double checking;
+    double savings;
+
+} BankAccount;
 
