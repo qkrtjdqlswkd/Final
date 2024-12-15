@@ -13,9 +13,11 @@
 #include "socketsetup.h"
 #include "bank.h"
 
-
 #define BUFLEN 512    //Max length of buffer
+double savings = 12479.52;
+double checking = 1291.22;
 
+char[] checkBalance;
 // simple routine to print an error and exit
 void PrintErrorAndExit(char *lanErrorString)
 {
@@ -25,9 +27,6 @@ void PrintErrorAndExit(char *lanErrorString)
     
 int main(void)
 {
-
-    BankAccount account = {1000.0, 500.0};
-    BankFunction bank_func;
     // instantiate our socket structures
     struct sockaddr_in lsSAMe, lsSAOther;
 
@@ -70,10 +69,10 @@ int main(void)
     {
         PrintErrorAndExit("bind");
     }
-    
     //keep listening for data
     while(1)
     {
+
         printf("Waiting for data...");
         fflush(stdout);
         
@@ -89,27 +88,20 @@ int main(void)
         printf("Received packet from %s:%d\n", inet_ntoa(lsSAOther.sin_addr), ntohs(lsSAOther.sin_port));
         
         // cast receieved data to expected type and print data
-        lpTestData = (TestData *)(lanRecBuf); 
-        printf("X = %d\n", lpTestData->lnX);
+
+        lpTestData = (TestRequest *)(lanRecBuf);
+        switch(lpTestData->choice){
+          case 1:
+            char response[256] = checkBalance(lpTestData->cORs);
+            break;
+          case 2:
+            char response[256] = deposit(lpTestData->cors, lpTestData->amount);
+            break;
+
         printf("Y = %f\n", lpTestData->lfY);
         printf("Text = %s\n", lpTestData->lanText);
 
 
-        if (strncmp(lpTestData->lanText, "CHECK_BAL", 9) == 0) {
-            check_bal(&account, &bankFunc);  
-            strcpy(lpTestData->lanText, bankFunc.response); 
-        } else if (strncmp(lpTestData->lanText, "DEPOSIT", 7) == 0) {
-            Deposit_mon(&account, &bankFunc);
-            strcpy(lpTestData->lanText, bankFunc.response);
-        } else if (strncmp(lpTestData->lanText, "WITHDRAW", 8) == 0) {
-            withdraw_mon(&account, &bankFunc); 
-            strcpy(lpTestData->lanText, bankFunc.response);
-        } else if (strncmp(lpTestData->lanText, "TRANSFER", 8) == 0) {
-            transfer_mon(&account, &bankFunc);
-            strcpy(lpTestData->lanText, bankFunc.response);
-        } else {
-            strcpy(lpTestData->lanText, "Unknown Command"); 
-        }
 
 	char response [1024];
 
@@ -132,118 +124,26 @@ int main(void)
     return 0;
 }
 
+char[] checkBalance(int cORs){
+        char response[256];
+     switch(cORs){
+         case 1:
+            sprintf(response, "Your checking account total is %f\n",checking);
+            return reponse;
+         case 2:
+            sprintf(response, "Your checking account total is %f\n",savings);
+            return response;
+  }
 
-
-
-void check_bal(BankAccount *account, BankFunction *choice){
-    printf("Which account?\n");
-    printf("1) Checking\n");
-    printf("2) Savings\n");
-    printf("Enter your choice: ");
-    scanf("%d", choice->&val);
-
-    switch (choice->val)
-        case 1:
-            sprintf(choice->response, "Checking Banlace: %.2f\n", account->checking_bal);
-            break;
-        case 2:
-            sprintf(choice->response, "Saving Balance is: %.2f\n", account->savings_bal);
-            break;
-        default:
-            printf("Invalid Selection. \n");
-            break;
-}
-
-
-void Deposit_mon(BankAccount *account, BankFunction *choice){
-    double amount;
-    printf("1) Checking\n");
-    printf("2) Savings\n");
-    printf("Enter your choice: ");
-    scanf("%d", choice->val);
-
-
-    printf("Enter amount: \n");
-    scanf("%.2f", &amount);
-
-    switch (choice->val)
-        case 1:
-            account->checking_bal+=amount;
-            sprintf(choice->response, "Deposit successfully\nNew Balance(Checking Account): %.2f\n", account->checking_bal);
-            break;
-        case 2:
-            account->savings_bal+=amount;
-            sprintf("Deposit successfully\nNew Balance(Saving Account): %.2f\n", account->savings_bal);
-            break;
-        default:
-            printf("Invalid Selection. \n");
-            break;
-}
-
-
-void withdraw_mon(BankAccount *account, BankFunction choice){
-    double amount;
-
-    printf("1) Checking\n");
-    printf("2) Savings\n");
-    printf("Enter your choice: ");
-    scanf("%d", choice->val);
-
-    printf("Enter amount: \n");
-    scanf("%.2f", &amount);
-
-
-    switch (choice->val)
-        case 1:
-            account->checking_bal-=amount;
-            sprintf(choice->response, "Deposit successfully\nNew Balance(Checking Account): %.2f\n", account->checking_bal);
-            break;
-        case 2:
-            account->savings_bal-=amount;
-            sprintf("Deposit successfully\nNew Balance(Saving Account): %.2f\n", account->savings_bal);
-            break;
-        default:
-            printf("Invalid Selection. \n");
-            break;
-}
-
-
-void transfer_mon(BankAccount *account, BankFunction *choice){
-    double amount;
-
-    printf("From which account are you transffering from? \n");
-    printf("1) Checking\n");
-    printf("2) Savings\n");
-    printf("Enter your choice: ");
-    scanf("%d", choice->val);
-
-    printf("Enter amount: \n");
-    scanf("%.2f", &amount);
-
-    switch (choice->val)
-    {
-        case 1:
-            if(amount > account->checking_bal){
-                printf("Insufficient Balance.\n");
-            }
-            else{
-                account->checking_bal-=amount;
-                account->savings_bal+=amount;
-                printf("Transferred Successfully.\n");
-                sprintf(choice->response,"Checking Account Balance after transaction: %.2f\n", account->checking_bal);
-                sprintf(choice->response, "Saving Account Balance after transaction: %.2f\n", account->savings_bal);
-            }
-            break;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
+  char[] deposit(int cORs, int amount){
+        char response[256];
+        switch(cORs){
+          case 1:
+            checking+=amount;
+            sprintf(response, "Your checking account total is now: %f\n",checking);
+            return response;
+          case 2:
+            savings+=amount;
+            sprintf(response, "Your savings account total is now: %f\n",savings);
+            return response;
+        }
